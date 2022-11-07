@@ -5,6 +5,7 @@
 #include<iomanip>
 #include<math.h>
 long double linear(long double x){return x;}
+long double _dtanh(long double x){return 2/(coshl(x*2)+1);}
 namespace MLPa{
 	template<class _rInt, class _rFloat>
 	class MLPa;
@@ -37,7 +38,8 @@ namespace SLPa{
 			;//std::cout<<"CA"<<std::endl;
 			this->num.weight=numOfWeights;
 			this->weight=new _rFloat[numOfWeights+1];
-			this->funcs.activatoin=&tanh; // ========Need to handle NullPtrException========
+			this->funcs.activatoin=&tanhl; // ========Need to handle NullPtrException========
+			this->funcs.dactivatoin=&_dtanh;
 			//weight[num.weight] -> bias
 		}
 		//Destructor
@@ -72,15 +74,18 @@ namespace SLPa{
 			s+=weight[i];
 			return funcs.activatoin(s);
 		}
-		public:_rFloat train(_rFloat*data, _rFloat(*dcostFunction)(_rFloat,_rFloat)/*output-y, target-y*/){
+		public:void train(_rFloat*data,_rFloat rate, _rFloat(*dcostFunction)(_rFloat,_rFloat)/*output-y, target-y*/){
 			_rFloat s=0;
 			_rInt i;
+			_rFloat tmp[num.weight+1];
 			for(i=0; i<num.weight; i++)s+=data[i]*weight[i];
 			s+=weight[i];
 
-			dcostFunction(funcs.activatoin(s),data[num.weight]);
-			funcs.dactivatoin(s)
-			a
+			s=dcostFunction(funcs.activatoin(s),data[num.weight])*funcs.dactivatoin(s);
+			for(i=0; i<num.weight; i++)tmp[i]=weight[i]-rate*s*data[i];
+			tmp[i]=weight[i]-rate*s;
+
+			for(i=num.weight;i+1;i--)weight[i]=tmp[i];
 		}
 
 		public:void _p(){ //Temporary Function
